@@ -411,22 +411,21 @@ task_t * scheduler() {
 
     curr_task = highest_prio = readyQueue;
 
-    // Choose highest aged_priority task (lowest number)
+    int curr_prio = curr_task->aged_prio;
+
     for(int i = 0; i < countTasks; i++){
-        // Using >= so output == example txt, > is also valid
-        if(highest_prio->aged_prio >= curr_task->aged_prio){
+        // Choose highest aged_priority task (lowest number)
+        if(curr_prio >= curr_task->aged_prio){ // Using >= so output == example txt, > is also valid
             highest_prio = curr_task;
+            curr_prio = highest_prio->aged_prio;
         }
-        curr_task = curr_task->next;
-    }
-    
-    // Age all tasks older
-    for(int i = 0; i < countTasks; i++){
-        curr_task->aged_prio = curr_task->aged_prio - 1;
-        curr_task = curr_task->next;
+
+        // Aging task
+        curr_task->aged_prio--;
         if(curr_task->aged_prio < -20){
             curr_task->aged_prio = -20;
         }
+        curr_task = curr_task->next;
     }
 
     // Reset chosen task priority
@@ -438,8 +437,8 @@ task_t * scheduler() {
 
 // define a prioridade estática de uma tarefa (ou a tarefa atual)
 void task_setprio (task_t *task, int prio) {
-    // TODO: implement someting here
-    //printf("\nSetPrio function called\n");
+    
+    // Prio vai de 20 a -20 em linux e PPOS
     if(prio > 20){
         prio = 20;
     }
@@ -447,19 +446,18 @@ void task_setprio (task_t *task, int prio) {
         prio = -20;
     }
 
+    // Ajusta tarefa em execução se não houver atual
     if(task == NULL){
         taskExec->prio = prio;
         taskExec->aged_prio = prio;
-        //printf("setting prio %d to task %d\n", prio, taskExec->id);
     }
     task->prio = prio;
     task->aged_prio = prio;
-    //printf("setting prio %d to task %d\n", prio, task->id);
 }
 
 // retorna a prioridade estática de uma tarefa (ou a tarefa atual)
 int task_getprio (task_t *task) {
-    // TODO: implement someting here
+    // Prio da tarefa em execução caso nenhuma seja passada
     if(task == NULL){
         return taskExec->prio;
     }
