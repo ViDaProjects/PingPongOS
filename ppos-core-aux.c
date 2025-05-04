@@ -406,20 +406,64 @@ int after_mqueue_msgs (mqueue_t *queue) {
 // Essa função implementa o escalonador de tarefas.
 // Implemente a política conforme os requisitos do projeto
 task_t * scheduler() {
-    // TODO: implement someting here
-    return NULL;
-}
 
+    task_t *curr_task, *highest_prio;
+
+    curr_task = highest_prio = readyQueue;
+
+    // Choose highest aged_priority task (lowest number)
+    for(int i = 0; i < countTasks; i++){
+        // Using >= so output == example txt, > is also valid
+        if(highest_prio->aged_prio >= curr_task->aged_prio){
+            highest_prio = curr_task;
+        }
+        curr_task = curr_task->next;
+    }
+    
+    // Age all tasks older
+    for(int i = 0; i < countTasks; i++){
+        curr_task->aged_prio = curr_task->aged_prio - 1;
+        curr_task = curr_task->next;
+        if(curr_task->aged_prio < -20){
+            curr_task->aged_prio = -20;
+        }
+    }
+
+    // Reset chosen task priority
+    highest_prio->aged_prio = highest_prio->prio;
+
+    // Return current task
+    return highest_prio;    
+}
 
 // define a prioridade estática de uma tarefa (ou a tarefa atual)
 void task_setprio (task_t *task, int prio) {
     // TODO: implement someting here
+    //printf("\nSetPrio function called\n");
+    if(prio > 20){
+        prio = 20;
+    }
+    else if(prio < -20){
+        prio = -20;
+    }
+
+    if(task == NULL){
+        taskExec->prio = prio;
+        taskExec->aged_prio = prio;
+        //printf("setting prio %d to task %d\n", prio, taskExec->id);
+    }
+    task->prio = prio;
+    task->aged_prio = prio;
+    //printf("setting prio %d to task %d\n", prio, task->id);
 }
 
 // retorna a prioridade estática de uma tarefa (ou a tarefa atual)
 int task_getprio (task_t *task) {
     // TODO: implement someting here
-    return -1;
+    if(task == NULL){
+        return taskExec->prio;
+    }
+    return task->prio;
 }
 
 

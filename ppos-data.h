@@ -27,6 +27,8 @@ typedef struct task_t
    void* custom_data; // internal data - do not modify!
 
    // ... (outros/novos campos deve ser adicionados APOS esse comentario)
+   int prio;
+   int aged_prio;
 
 
 } task_t ;
